@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import jellyfish as jf
 
+# Función para quitar tildes
 def normalize(s):
     replacements = (
         ("á", "a"),
@@ -14,6 +15,7 @@ def normalize(s):
         s = s.replace(a, b).replace(a.upper(), b.upper())
     return s
 
+# Función para encontrar similitud entre palabras que son iguales pero se han escrito distinto
 def name_matcher(original_matriz,matriz_to_merge,column_with_nan_spaces):
     # Combino los dataframes por nombre del municipio
     final_with_errors = pd.merge(original_matriz, matriz_to_merge, on='Municipality', how='outer')
@@ -30,13 +32,16 @@ def name_matcher(original_matriz,matriz_to_merge,column_with_nan_spaces):
         print(f'{i} was replaced for {winner}')
         matriz_to_merge.loc[matriz_to_merge['Municipality']==i,'Municipality'] = winner
 
+# Función para verificar el tamaño de la matriz
 def size_error(matriz_after_merge, n):
     if matriz_after_merge.shape[0] == n:
         print("No hay errores")
     else:
         print("Hubo algún error")
-        
+
+#####################################################################################################
 # Paths of Files
+#####################################################################################################
 
 # This file is too big to upload it to the repository. Change the path to your local file 'People'
 people_file_path = "D:/UNIVERSIDAD/DANE Dengue/Git Repositorios/CNPV2018_5PER_A2_05.CSV"
@@ -45,14 +50,21 @@ dengue_data_file = "Data_Files/DANE_Dengue_Data_2015_2019.csv"
 health_providers_file = "Data_Files/Health_Providers.csv"
 municipality_area_file = "Data_Files/Municipality_Area.csv"
 
+#####################################################################################################
 # Reading the csv files
+#####################################################################################################
+
 people_data = pd.read_csv(people_file_path, usecols=['U_MPIO', 'P_EDADR', 'PA1_GRP_ETNIC', 'CONDICION_FISICA',
                                                     'P_ALFABETA', 'P_NIVEL_ANOSR', 'P_TRABAJO'])
 municipality_data = pd.read_csv(dengue_data_file, usecols=['State code','Municipality code', 'Municipality'])
 health_providers_data = pd.read_csv(health_providers_file, usecols=['depa_nombre', 'muni_nombre','nombre_prestador'])
 municipality_area_data = pd.read_csv(municipality_area_file)
 
-# número de municipios en el archivo
+#####################################################################################################
+# Inicio del codigo
+#####################################################################################################
+
+# Número de municipios en el archivo
 n = len(people_data['U_MPIO'].unique())
 
 # Crear matriz de salida
@@ -60,6 +72,10 @@ s = np.zeros((n,15))
 
 # Poner código de municipio en primera columna de matriz de salida
 s[:,0] = people_data['U_MPIO'].unique()
+
+#####################################################################################################
+# Se van a encontrar las variables posibles en el archivo de 'Personas'
+#####################################################################################################
 
 # Iterar por cada municipio para encontrar P_EDADR de 0 a 4 años (osea valor en 1)
 for i in range(0,n):
@@ -238,9 +254,10 @@ s[:,1:] = np.round(s[:,1:]*100,2)
 # Se ajustan los codigos de cada municipio para el merge final
 s[:,0] = s[:,0] + 5000
 
-#print(s)
-
+#####################################################################################################
 # Merging with the main file
+#####################################################################################################
+
 main_file = pd.read_csv(dengue_data_file)
 DANE_Dengue_Data_Variables = pd.DataFrame(s, columns = ['Municipality code','Age 0-4 (%)','Age 5-14 (%)','Age 15-29 (%)','Age >30 (%)',
                                         'Afrocolombian Population (%)','Indian Population (%)',
