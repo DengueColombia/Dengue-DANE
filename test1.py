@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import jellyfish as jf
 
 def normalize(s):
     replacements = (
@@ -15,8 +16,9 @@ def normalize(s):
 
 # Paths of Files
 
-# This file is too big to upload it to the repository. Change the path to your local file People File
+# This file is too big to upload it to the repository. Change the path to your local file 'People'
 people_file_path = "D:/UNIVERSIDAD/DANE Dengue/Git Repositorios/CNPV2018_5PER_A2_05.CSV"
+
 dengue_data_file = "Data_Files/DANE_Dengue_Data_2015_2019.csv"
 health_providers_file = "Data_Files/Health_Providers.csv"
 municipality_area_file = "Data_Files/Municipality_Area.csv"
@@ -34,7 +36,7 @@ n = len(people_data['U_MPIO'].unique())
 # Crear matriz de salida
 s = np.zeros((n,15))
 
-#poner código de municipio en primera columna de matriz de salida
+# Poner código de municipio en primera columna de matriz de salida
 s[:,0] = people_data['U_MPIO'].unique()
 
 # Iterar por cada municipio para encontrar P_EDADR de 0 a 4 años (osea valor en 1)
@@ -158,7 +160,8 @@ for i in range(0,n):
 # Selecciono los municipios de Antioquia y borro la columna de codigo de estado
 matriz = municipality_data[municipality_data['State code']==5]
 del matriz['State code']
-# Se itera cada municipio, se cambia a MAYUSCULAS y se quitan tildes
+# Se itera cada municipio, se cambia a MAYUSCULAS y se quitan tildes. Tambien se dejan los codigos de cada
+# municipio igual a como los presenta el DANE (solo decenas y unidades)
 for i in range(0,len(matriz['Municipality'])):
     matriz.loc[i,'Municipality'] = normalize(matriz.loc[i,'Municipality'].upper())
     matriz.loc[i,'Municipality code'] = matriz.loc[i,'Municipality code'] - 5000
@@ -171,20 +174,31 @@ hospitales = table.values
 # Creo un dataframe con los anteriores datos para hacer mas facil el merge
 diccionario = {'Municipality':municipios, 'Hospitals':hospitales}
 prestadores = pd.DataFrame(data=diccionario)
+
 # Mayusculas y quito tildes
 for i in range(0,len(prestadores['Municipality'])):
     prestadores.loc[i,'Municipality'] = normalize(prestadores.loc[i,'Municipality'].upper())
 
-# Cambio los nombres que tenían diferencias en la base de datos para que coincidan
-prestadores.loc[prestadores['Municipality']=='DON MATIAS','Municipality'] = 'DONMATIAS'
-prestadores.loc[prestadores['Municipality']=='ITAGUI','Municipality'] = 'ITAGÜI'
-prestadores.loc[prestadores['Municipality']=='SAN ANDRES','Municipality'] = 'SAN ANDRES DE CUERQUIA'
-prestadores.loc[prestadores['Municipality']=='SAN PEDRO','Municipality'] = 'SAN PEDRO DE LOS MILAGROS'
-prestadores.loc[prestadores['Municipality']=='SAN VICENTE','Municipality'] = 'SAN VICENTE FERRER'
-prestadores.loc[prestadores['Municipality']=='SANTAFE DE ANTIOQUIA','Municipality'] = 'SANTA FE DE ANTIOQUIA'
-
 # Combino los dataframes por nombre del municipio
+final_with_errors = pd.merge(matriz, prestadores, on='Municipality', how='outer')
+
+# Tomo los municipios que no obtuvieron coincidencia por nombre
+prestadores_errors = final_with_errors.iloc[n:,:]
+matriz_errors = final_with_errors[np.isnan(final_with_errors['Hospitals'])]
+for i in prestadores_errors['Municipality']:
+    score = 0
+    winner = ''
+    for j in matriz_errors['Municipality']:
+        if jf.jaro_winkler_similarity(i, j) >= score:
+            score = jf.jaro_winkler_similarity(i, j)
+            winner = j
+    print(f'{i} was replaced for {winner}')
+    prestadores.loc[prestadores['Municipality']==i,'Municipality'] = winner
 final = pd.merge(matriz, prestadores, on='Municipality', how='outer')
+if final.shape[0] == n:
+    print("No hay errores")
+else:
+    print("Hubo algún error")
 # Cambio los NaN por cero
 final.fillna(0, inplace=True)
 
@@ -199,15 +213,30 @@ del area['Departamento']
 for i in range(0,len(area['Municipality'])):
     area.loc[i,'Municipality'] = normalize(area.loc[i,'Municipality'].upper())
 
-# Cambio los nombres que tenían diferencias en la base de datos para que coincidan
-area.loc[area['Municipality']=='CARMEN DE VIBORAL','Municipality'] = 'EL CARMEN DE VIBORAL'
-area.loc[area['Municipality']=='CAROLINA DEL PRINCIPE','Municipality'] = 'CAROLINA'
-area.loc[area['Municipality']=='EL PEÑOL','Municipality'] = 'PEÑOL'
-area.loc[area['Municipality']=='EL RETIRO','Municipality'] = 'RETIRO'
-area.loc[area['Municipality']=='SAN VICENTE','Municipality'] = 'SAN VICENTE FERRER'
-
 # Combino los dataframes por nombre del municipio
+final_with_errors = pd.merge(final, area, on='Municipality', how='outer')
+
+# Tomo los municipios que no obtuvieron coincidencia por nombre
+municipality_area_errors = final_with_errors.iloc[n:,:]
+matriz_errors = final_with_errors[np.isnan(final_with_errors['Area (km2)'])]
+for i in municipality_area_errors['Municipality']:
+    score = 0
+    winner = ''
+    for j in matriz_errors['Municipality']:
+        if jf.jaro_winkler_similarity(i, j) >= score:
+            score = jf.jaro_winkler_similarity(i, j)
+            winner = j
+    print(f'{i} was replaced for {winner}')
+    area.loc[area['Municipality']==i,'Municipality'] = winner
 final_2 = pd.merge(final, area, on='Municipality', how='outer')
+if final_2.shape[0] == n:
+    print("No hay errores")
+else:
+    print("Hubo algún error")
+# Cambio los NaN por cero
+final_2.fillna(0, inplace=True)
+
+
 # Creo una lista con la cantidad de hospitales por km2 en orden de codigo municipal
 m = final_2['Hospitals'].values / final_2['Area (km2)'].values
 # Se agrega a la matriz final
