@@ -14,6 +14,28 @@ def normalize(s):
         s = s.replace(a, b).replace(a.upper(), b.upper())
     return s
 
+def name_matcher(original_matriz,matriz_to_merge,column_with_nan_spaces):
+    # Combino los dataframes por nombre del municipio
+    final_with_errors = pd.merge(original_matriz, matriz_to_merge, on='Municipality', how='outer')
+    # Tomo los municipios que no obtuvieron coincidencia por nombre
+    matriz_with_wrong_names = final_with_errors.iloc[n:,:]
+    matriz_with_blanks = final_with_errors[np.isnan(final_with_errors[column_with_nan_spaces])]
+    for i in matriz_with_wrong_names['Municipality']:
+        score = 0
+        winner = ''
+        for j in matriz_with_blanks['Municipality']:
+            if jf.jaro_winkler_similarity(i, j) >= score:
+                score = jf.jaro_winkler_similarity(i, j)
+                winner = j
+        print(f'{i} was replaced for {winner}')
+        matriz_to_merge.loc[matriz_to_merge['Municipality']==i,'Municipality'] = winner
+
+def size_error(matriz_after_merge, n):
+    if matriz_after_merge.shape[0] == n:
+        print("No hay errores")
+    else:
+        print("Hubo algún error")
+        
 # Paths of Files
 
 # This file is too big to upload it to the repository. Change the path to your local file 'People'
@@ -179,26 +201,12 @@ prestadores = pd.DataFrame(data=diccionario)
 for i in range(0,len(prestadores['Municipality'])):
     prestadores.loc[i,'Municipality'] = normalize(prestadores.loc[i,'Municipality'].upper())
 
-# Combino los dataframes por nombre del municipio
-final_with_errors = pd.merge(matriz, prestadores, on='Municipality', how='outer')
-
-# Tomo los municipios que no obtuvieron coincidencia por nombre
-prestadores_errors = final_with_errors.iloc[n:,:]
-matriz_errors = final_with_errors[np.isnan(final_with_errors['Hospitals'])]
-for i in prestadores_errors['Municipality']:
-    score = 0
-    winner = ''
-    for j in matriz_errors['Municipality']:
-        if jf.jaro_winkler_similarity(i, j) >= score:
-            score = jf.jaro_winkler_similarity(i, j)
-            winner = j
-    print(f'{i} was replaced for {winner}')
-    prestadores.loc[prestadores['Municipality']==i,'Municipality'] = winner
+# Busco los municipios que no coincidieron en nombre y los combino con su municipio respectivo
+name_matcher(matriz, prestadores, 'Hospitals')
+# Hago el merge definitivo
 final = pd.merge(matriz, prestadores, on='Municipality', how='outer')
-if final.shape[0] == n:
-    print("No hay errores")
-else:
-    print("Hubo algún error")
+# Compruebo que todos los municipios hayan encontrado su pareja, observando el tamaño de la matriz de salida
+size_error(final, n)
 # Cambio los NaN por cero
 final.fillna(0, inplace=True)
 
@@ -213,29 +221,14 @@ del area['Departamento']
 for i in range(0,len(area['Municipality'])):
     area.loc[i,'Municipality'] = normalize(area.loc[i,'Municipality'].upper())
 
-# Combino los dataframes por nombre del municipio
-final_with_errors = pd.merge(final, area, on='Municipality', how='outer')
-
-# Tomo los municipios que no obtuvieron coincidencia por nombre
-municipality_area_errors = final_with_errors.iloc[n:,:]
-matriz_errors = final_with_errors[np.isnan(final_with_errors['Area (km2)'])]
-for i in municipality_area_errors['Municipality']:
-    score = 0
-    winner = ''
-    for j in matriz_errors['Municipality']:
-        if jf.jaro_winkler_similarity(i, j) >= score:
-            score = jf.jaro_winkler_similarity(i, j)
-            winner = j
-    print(f'{i} was replaced for {winner}')
-    area.loc[area['Municipality']==i,'Municipality'] = winner
+# Busco los municipios que no coincidieron en nombre y los combino con su municipio respectivo
+name_matcher(final, area, 'Area (km2)')
+# Hago el merge definitivo
 final_2 = pd.merge(final, area, on='Municipality', how='outer')
-if final_2.shape[0] == n:
-    print("No hay errores")
-else:
-    print("Hubo algún error")
+# Compruebo que todos los municipios hayan encontrado su pareja, observando el tamaño de la matriz de salida
+size_error(final_2, n)
 # Cambio los NaN por cero
 final_2.fillna(0, inplace=True)
-
 
 # Creo una lista con la cantidad de hospitales por km2 en orden de codigo municipal
 m = final_2['Hospitals'].values / final_2['Area (km2)'].values
