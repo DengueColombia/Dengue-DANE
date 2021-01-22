@@ -47,6 +47,7 @@ def size_error(matriz_after_merge, n):
 people_file_path = "D:/UNIVERSIDAD/DANE Dengue/Git Repositorios/CNPV2018_5PER_A2_05.CSV"
 
 houses_file_path = "D:/UNIVERSIDAD/DANE Dengue/Git Repositorios/CNPV2018_2HOG_A2_05.CSV"
+viv_file_path = "D:/UNIVERSIDAD/DANE Dengue/Git Repositorios/CNPV2018_1VIV_A2_05.CSV"
 dengue_data_file = "Data_Files/DANE_Dengue_Data_2015_2019.csv"
 health_providers_file = "Data_Files/Health_Providers.csv"
 municipality_area_file = "Data_Files/Municipality_Area.csv"
@@ -56,8 +57,9 @@ municipality_area_file = "Data_Files/Municipality_Area.csv"
 #####################################################################################################
 
 people_data = pd.read_csv(people_file_path, usecols=['U_MPIO', 'P_EDADR', 'PA1_GRP_ETNIC', 'CONDICION_FISICA',
-                                                    'P_ALFABETA', 'P_NIVEL_ANOSR', 'P_TRABAJO'])
+                                                    'P_ALFABETA', 'P_NIVEL_ANOSR', 'P_TRABAJO', 'P_SEXO'])
 houses_data = pd.read_csv(houses_file_path, usecols=['U_MPIO','COD_ENCUESTAS'])
+viv_data = pd.read_csv(viv_file_path, usecols=['U_MPIO', 'VA1_ESTRATO', 'VB_ACU', 'VF_INTERNET'])
 municipality_data = pd.read_csv(dengue_data_file, usecols=['State code','Municipality code', 'Municipality'])
 health_providers_data = pd.read_csv(health_providers_file, usecols=['depa_nombre', 'muni_nombre','nombre_prestador'])
 municipality_area_data = pd.read_csv(municipality_area_file)
@@ -70,7 +72,7 @@ municipality_area_data = pd.read_csv(municipality_area_file)
 n = len(people_data['U_MPIO'].unique())
 
 # Crear matriz de salida
-s = np.zeros((n,16))
+s = np.zeros((n,26))
 
 # Poner código de municipio en primera columna de matriz de salida
 s[:,0] = people_data['U_MPIO'].unique()
@@ -193,6 +195,45 @@ for i in range(0,n):
     # guardar en matriz de salida
     s[i,13] = aux2
 
+    # Número de personas del municipio s[i,0] y sexo ==1 hombre o ==2 mujer
+    aux1 = len(people_data[(people_data['U_MPIO']==s[i,0]) & (people_data['P_SEXO']==1)])
+    # Llevar a porcentaje dividiendo por el total de personas del municipio
+    aux2 = aux1/ len(people_data[people_data['U_MPIO']==s[i,0]])
+    # guardar en matriz de salida
+    s[i,14] = aux2 #Hombres
+
+    # Número de personas del municipio s[i,0] y sexo ==1 hombre o ==2 mujer
+    aux1 = len(people_data[(people_data['U_MPIO']==s[i,0]) & (people_data['P_SEXO']==2)])
+    # Llevar a porcentaje dividiendo por el total de personas del municipio
+    aux2 = aux1/ len(people_data[people_data['U_MPIO']==s[i,0]])
+    # guardar en matriz de salida
+    s[i,15] = aux2 #Mujeres
+
+    # Para agua
+    aux1 = len(viv_data[(viv_data['U_MPIO']==s[i,0]) & (viv_data['VB_ACU']==2)])
+    # Llevar a porcentaje dividiendo por el total de personas del municipio
+    aux2 = aux1/ len(viv_data[viv_data['U_MPIO']==s[i,0]])
+    # guardar en matriz de salida
+    s[i,16] = aux2
+
+    # Para internet
+    aux1 = len(viv_data[(viv_data['U_MPIO']==s[i,0]) & (viv_data['VF_INTERNET']==2)])
+    # Llevar a porcentaje dividiendo por el total de personas del municipio
+    aux2 = aux1/ len(viv_data[viv_data['U_MPIO']==s[i,0]])
+    # guardar en matriz de salida
+    s[i,17] = aux2
+
+#ciclo while permite categorizar los seis estratos existentes
+mun = 1
+while (mun < 7):
+    for i in range(0,n):
+        estrato = len(viv_data[(viv_data['U_MPIO']==s[i,0]) & (viv_data['VA1_ESTRATO']==mun)])
+        # Llevar a porcentaje dividiendo por el total de personas del municipio
+        estrato = estrato/ len(viv_data[viv_data['U_MPIO']==s[i,0]])
+        # guardar en matriz de salida
+        s[i,17+mun] = estrato
+    mun += 1
+
 #######################################################################################
 # Ahora se va a calcular el numero de hospitales por km2
 #######################################################################################
@@ -251,7 +292,7 @@ final_2.fillna(0, inplace=True)
 # Creo una lista con la cantidad de hospitales por km2 en orden de codigo municipal
 m = final_2['Hospitals'].values / final_2['Area (km2)'].values
 # Se agrega a la matriz final
-s[:,14] = m
+s[:,24] = m
 
 #######################################################################################
 # Ahora se va a calcular el numero de hogares por km2
@@ -274,7 +315,8 @@ size_error(final_3, n)
 # Creo una lista con la cantidad de hogares por km2 en orden de codigo municipal
 m = final_3['Houses'].values / final_3['Area (km2)'].values
 # Se agrega a la matriz final
-s[:,15] = m
+s[:,25] = m
+# Redondeamos todos los resultados a dos decimales y se escriben como porcentaje
 s[:,1:] = np.round(s[:,1:]*100,2)
 # Se ajustan los codigos de cada municipio para el merge final
 s[:,0] = s[:,0] + 5000
@@ -282,13 +324,38 @@ s[:,0] = s[:,0] + 5000
 #####################################################################################################
 # Merging with the main file
 #####################################################################################################
-
+columns_names = ['Municipality code',
+                'Age 0-4 (%)',
+                'Age 5-14 (%)',
+                'Age 15-29 (%)',
+                'Age >30 (%)',
+                'Afrocolombian Population (%)',
+                'Indian Population (%)',
+                'People with Disabilities (%)',
+                'People who cannot read or write (%)',
+                'Secondary/Higher Education (%)',
+                'Employed population (%)',
+                'Unemployed population (%)',
+                'People doing housework (%)',
+                'Retired people (%)',
+                'Men (%)',
+                'Women (%)',
+                'Households without water access (%)',
+                'Households without internet access (%)',
+                'Building stratification 1 (%)',
+                'Building stratification 2 (%)',
+                'Building stratification 3 (%)',
+                'Building stratification 4 (%)',
+                'Building stratification 5 (%)',
+                'Building stratification 6 (%)',
+                'Number of hospitals per Km2',
+                'Number of houses per Km2']
 main_file = pd.read_csv(dengue_data_file)
-DANE_Dengue_Data_Variables = pd.DataFrame(s, columns = ['Municipality code','Age 0-4 (%)','Age 5-14 (%)','Age 15-29 (%)','Age >30 (%)',
-                                        'Afrocolombian Population (%)','Indian Population (%)',
-                                        'People with Disabilities (%)','People who cannot read or write (%)',
-                                        'Secondary/Higher Education (%)', 'Employed population (%)',
-                                        'Unemployed population (%)','People doing housework (%)',
-                                        'Retired people (%)', 'Number of hospitals per Km2', 'Number of houses per Km2'])
+DANE_Dengue_Data_Variables = pd.DataFrame(s, columns = columns_names)
 final_file = pd.merge(main_file, DANE_Dengue_Data_Variables, on='Municipality code', how='outer')
+# Optimization
+final_file['Municipality code'] = final_file['Municipality code'].apply(int)
+final_file['Municipality code'] = pd.to_numeric(final_file['Municipality code'], downcast='integer')
+# Creating the csv file
 final_file.to_csv('DANE_Dengue_Data_Variables.csv', index=False)
+print(final_file)
