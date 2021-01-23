@@ -276,7 +276,7 @@ def function2(state_code, municipality_data, health_providers_data, municipality
     codigos_de_municipio = matriz['Municipality code']
     # Itero y encuentro el numero de hogares por municipio
     for i in range(0,n):
-        hogares_por_municipio.append(len(houses_data[houses_data['U_MPIO'] == s[i,0]]['COD_ENCUESTAS'].unique()))
+        hogares_por_municipio.append(len(houses_data[houses_data['U_MPIO'] == codigos_de_municipio[i]]['COD_ENCUESTAS'].unique()))
     # Creo un diccionario para crear el dataframe
     diccionario = {'Municipality code':codigos_de_municipio, 'Houses':hogares_por_municipio}
     # Creo el dataframe

@@ -43,7 +43,7 @@ s = function1(people_data,viv_data)
 # Ahora se va a calcular el numero de hospitales por km2 y el numero de hogares por km2
 #######################################################################################
 
-s[:,24:26] = function2(state_code, municipality_data, health_providers_data, municipality_area_data, houses_data)
+s[:,24:27] = function2(state_code, municipality_data, health_providers_data, municipality_area_data, houses_data)
 # Redondeamos todos los resultados a dos decimales y se escriben como porcentaje
 s[:,1:] = np.round(s[:,1:]*100,2)
 # Se ajustan los codigos de cada municipio para el merge final
