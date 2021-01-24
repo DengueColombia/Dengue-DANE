@@ -21,7 +21,22 @@ def name_matcher(original_matriz,matriz_to_merge,column_with_nan_spaces,n):
     final_with_errors = pd.merge(original_matriz, matriz_to_merge, on='Municipality', how='outer')
     # Tomo los municipios que no obtuvieron coincidencia por nombre
     matriz_with_wrong_names = final_with_errors.iloc[n:,:]
+    print("==================================================")
+    print("Matriz con nombres equivocados")
+    print("==================================================")
+    print(matriz_with_wrong_names)
     matriz_with_blanks = final_with_errors[np.isnan(final_with_errors[column_with_nan_spaces])]
+    print("==================================================")
+    print("Matriz con espacios vacíos")
+    print("==================================================")
+    print(matriz_with_blanks)
+    '''if(matriz_with_wrong_names.shape[0]>matriz_with_blanks.shape[0]):
+        aux = matriz_with_wrong_names
+        matriz_with_wrong_names = matriz_with_blanks
+        matriz_with_blanks = aux
+        aux2 = original_matriz
+        original_matriz = matriz_to_merge
+        matriz_to_merge = aux2'''
     for i in matriz_with_wrong_names['Municipality']:
         score = 0
         winner = ''
@@ -37,7 +52,9 @@ def size_error(matriz_after_merge, n):
     if matriz_after_merge.shape[0] == n:
         print("No hay errores")
     else:
+        print("==================================================")
         print("Hubo algún error")
+        print("==================================================")
 
 # Funcion para calcular variables de people and viv files
 def function1(people_data, viv_data):
@@ -205,14 +222,15 @@ def function1(people_data, viv_data):
 
     return s
 
-# Funcion para calcular el numero de hospitales por km2
-def function2(state_code, municipality_data, health_providers_data, municipality_area_data, houses_data):
+# Funcion para calcular el numero de hospitales por km2 y el numero de hogares por km2
+def function2(state_code, state_name, municipality_data, health_providers_data, municipality_area_data, houses_data):
     #######################################################################################
     # Primero se va a calcular el numero de hospitales por km2
     #######################################################################################
     # Selecciono los municipios del departamento correspondiente y borro la columna de codigo de estado
     matriz = municipality_data[municipality_data['State code']==state_code]
     del matriz['State code']
+    matriz = matriz.reset_index(drop=True)
     n = len(matriz['Municipality'])
     # Crear matriz de salida
     s = np.zeros((n,2))
@@ -236,7 +254,7 @@ def function2(state_code, municipality_data, health_providers_data, municipality
         prestadores.loc[i,'Municipality'] = normalize(prestadores.loc[i,'Municipality'].upper())
 
     # Busco los municipios que no coincidieron en nombre y los combino con su municipio respectivo
-    name_matcher(matriz, prestadores, 'Hospitals',n)
+    name_matcher(matriz, prestadores, 'Hospitals', n)
     # Hago el merge definitivo
     final = pd.merge(matriz, prestadores, on='Municipality', how='outer')
     # Compruebo que todos los municipios hayan encontrado su pareja, observando el tamaño de la matriz de salida
@@ -244,8 +262,8 @@ def function2(state_code, municipality_data, health_providers_data, municipality
     # Cambio los NaN por cero
     final.fillna(0, inplace=True)
 
-    # Selecciono los municipios de Antioquia en el archivo 'Municipality_Area' y reinicio los indices del dataframe
-    area = municipality_area_data[municipality_area_data['Departamento']=='Antioquia']
+    # Selecciono los municipios del departamento respectivo en el archivo 'Municipality_Area' y reinicio los indices del dataframe
+    area = municipality_area_data[municipality_area_data['Departamento']==state_name]
     area.index = range(len(area.index))
     # Cambio el nombre de la columna para el merge y elimino la columna de departamento
     area.rename(columns={'Municipio':'Municipality'}, inplace=True)
@@ -256,14 +274,11 @@ def function2(state_code, municipality_data, health_providers_data, municipality
         area.loc[i,'Municipality'] = normalize(area.loc[i,'Municipality'].upper())
 
     # Busco los municipios que no coincidieron en nombre y los combino con su municipio respectivo
-    name_matcher(final, area, 'Area (km2)',n)
+    name_matcher(final, area, 'Area (km2)', n)
     # Hago el merge definitivo
     final_2 = pd.merge(final, area, on='Municipality', how='outer')
     # Compruebo que todos los municipios hayan encontrado su pareja, observando el tamaño de la matriz de salida
     size_error(final_2, n)
-    # Cambio los NaN por cero
-    final_2.fillna(0, inplace=True)
-
     # Agrego a la lista la cantidad de hospitales por km2 en orden de codigo municipal
     s[:,0] = final_2['Hospitals'].values / final_2['Area (km2)'].values
 
