@@ -98,13 +98,13 @@ for i in range(len(states)):
     #####################################################################################################
 
     Municipality_Data = pd.DataFrame(s, columns = columns_names)
-    aux_df = pd.merge(main_file, Municipality_Data, on='Municipality code', how='inner')
-    municipalities_df.append(aux_df)
+    municipalities_df.append(Municipality_Data)
 
 # Optimization
 final = municipalities_df[0]
 for i in range(1,len(municipalities_df)):
     final = final.append(municipalities_df[i],ignore_index=True)
+# Falta eliminar columnas innecesarias antes del merge
 main_file = main_file.merge(final, on='Municipality code', how='outer')
 main_file['Municipality code'] = main_file['Municipality code'].apply(int)
 main_file['Municipality code'] = pd.to_numeric(main_file['Municipality code'], downcast='integer')
