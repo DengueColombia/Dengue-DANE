@@ -520,7 +520,7 @@ Córdoba,San Bernardo del Viento,321
 Córdoba,San Carlos,505
 Córdoba,San José de Uré,516
 Córdoba,San Pelayo,451
-Córdoba,Santa Cruz de Lorica,1033
+Córdoba,Lorica,1033
 Córdoba,Tierralta,5025
 Córdoba,Tuchín,128
 Córdoba,Valencia,914
@@ -645,9 +645,10 @@ Guainía,Barrancominas,12914
 Guainía,Cacahual,6457
 Guainía,Inírida,16165
 Guainía,La Guadalupe,1167
-Guainía,Morichal Nuevo,
-Guainía,Pana Pana,
-Guainía,Puerto Colombia,
+Guainía,Mapiripana,6457
+Guainía,Morichal Nuevo,8563
+Guainía,Pana Pana,10097
+Guainía,Puerto Colombia,15664
 Guainía,San Felipe,3063
 Guaviare,Calamar,14300
 Guaviare,El Retorno,11618
@@ -764,7 +765,7 @@ Meta,San Juanito,162
 Meta,San Martín,5959
 Meta,Villavicencio,1313
 Meta,Vista Hermosa,4084
-Nariño,San José de Albán,83
+Nariño,Albán,83
 Nariño,Aldana,65
 Nariño,Ancuya,73
 Nariño,Arboleda,63
@@ -782,7 +783,7 @@ Nariño,Cumbitara,365
 Nariño,El Charco,1285
 Nariño,El Peñol,121
 Nariño,El Rosario,566
-Nariño,El Tablón,255
+Nariño,El Tablón de Gomez,255
 Nariño,El Tambo,282
 Nariño,Francisco Pizarro,956
 Nariño,Funes,407
@@ -825,49 +826,49 @@ Nariño,Santacruz,555
 Nariño,Sapuyes,133
 Nariño,Taminango,245
 Nariño,Tangua,239
-Nariño,Tumaco,3778
+Nariño,San Andres de Tumaco,3778
 Nariño,Túquerres,227
 Nariño,Yacuanquer,115
-Norte de Santander,Ábrego,1582
-Norte de Santander,Arboledas,454
-Norte de Santander,Bochalema,172
-Norte de Santander,Bucarasica,267
-Norte de Santander,Cáchira,605
-Norte de Santander,Cácota,139
-Norte de Santander,Chinácota,166
-Norte de Santander,Chitagá,1172
-Norte de Santander,Convención,829
-Norte de Santander,Cúcuta,1176
-Norte de Santander,Cucutilla,372
-Norte de Santander,Durania,177
-Norte de Santander,El Carmen,1723
-Norte de Santander,El Tarra,471
-Norte de Santander,El Zulia,449
-Norte de Santander,Gramalote,147
-Norte de Santander,Hacarí,410
-Norte de Santander,Herrán,112
-Norte de Santander,La Esperanza,695
-Norte de Santander,La Playa de Belén,241
-Norte de Santander,Labateca,253
-Norte de Santander,Los Patios,133
-Norte de Santander,Lourdes,87
-Norte de Santander,Mutiscua,159
-Norte de Santander,Ocaña,460
-Norte de Santander,Pamplona,318
-Norte de Santander,Pamplonita,176
-Norte de Santander,Puerto Santander,42
-Norte de Santander,Ragonvalia,95
-Norte de Santander,Salazar de Las Palmas,493
-Norte de Santander,San Calixto,387
-Norte de Santander,San Cayetano,144
-Norte de Santander,Santiago,173
-Norte de Santander,Santo Domingo de Silos,381
-Norte de Santander,Sardinata,1451
-Norte de Santander,Teorama,852
-Norte de Santander,Tibú,2737
-Norte de Santander,Toledo,1578
-Norte de Santander,Villa Caro,402
-Norte de Santander,Villa del Rosario,228
+Norte De Santander,Ábrego,1582
+Norte De Santander,Arboledas,454
+Norte De Santander,Bochalema,172
+Norte De Santander,Bucarasica,267
+Norte De Santander,Cáchira,605
+Norte De Santander,Cácota,139
+Norte De Santander,Chinácota,166
+Norte De Santander,Chitagá,1172
+Norte De Santander,Convención,829
+Norte De Santander,Cúcuta,1176
+Norte De Santander,Cucutilla,372
+Norte De Santander,Durania,177
+Norte De Santander,El Carmen,1723
+Norte De Santander,El Tarra,471
+Norte De Santander,El Zulia,449
+Norte De Santander,Gramalote,147
+Norte De Santander,Hacarí,410
+Norte De Santander,Herrán,112
+Norte De Santander,La Esperanza,695
+Norte De Santander,La Playa de Belén,241
+Norte De Santander,Labateca,253
+Norte De Santander,Los Patios,133
+Norte De Santander,Lourdes,87
+Norte De Santander,Mutiscua,159
+Norte De Santander,Ocaña,460
+Norte De Santander,Pamplona,318
+Norte De Santander,Pamplonita,176
+Norte De Santander,Puerto Santander,42
+Norte De Santander,Ragonvalia,95
+Norte De Santander,Salazar de Las Palmas,493
+Norte De Santander,San Calixto,387
+Norte De Santander,San Cayetano,144
+Norte De Santander,Santiago,173
+Norte De Santander,Santo Domingo de Silos,381
+Norte De Santander,Sardinata,1451
+Norte De Santander,Teorama,852
+Norte De Santander,Tibú,2737
+Norte De Santander,Toledo,1578
+Norte De Santander,Villa Caro,402
+Norte De Santander,Villa del Rosario,228
 Putumayo,Colón,77
 Putumayo,Mocoa,1030
 Putumayo,Orito,2026
@@ -907,7 +908,8 @@ Risaralda,Pueblo Rico,1020
 Risaralda,Quinchía,150
 Risaralda,Santa Rosa de Cabal,486
 Risaralda,Santuario,226
-San Andrés y Providencia,Providencia y Santa Catalina Islas,18
+San Andres Providencia Y Santa Catalina,San Andres,26
+San Andres Providencia Y Santa Catalina,Providencia y Santa Catalina Islas,18
 Santander,Aguada,75
 Santander,Albania,167
 Santander,Aratoca,170
@@ -1009,7 +1011,7 @@ Sucre,Los Palmitos,125
 Sucre,Majagual,826
 Sucre,Morroa,161
 Sucre,Ovejas,447
-Sucre,San Antonio de Palmito,176
+Sucre,Palmito,176
 Sucre,Sampués,209
 Sucre,San Benito Abad,1592
 Sucre,San Juan de Betulia,199
@@ -1081,7 +1083,7 @@ Valle del Cauca,Cali,562
 Valle del Cauca,Candelaria,285
 Valle del Cauca,Cartago,279
 Valle del Cauca,Dagua,886
-Valle del Cauca,Darién,1154
+Valle del Cauca,Calima,1154
 Valle del Cauca,El Águila,199
 Valle del Cauca,El Cairo,283
 Valle del Cauca,El Cerrito,466
