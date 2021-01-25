@@ -30,13 +30,6 @@ def name_matcher(original_matriz,matriz_to_merge,column_with_nan_spaces,n):
     print("Matriz con espacios vacíos")
     print("==================================================")
     print(matriz_with_blanks)
-    '''if(matriz_with_wrong_names.shape[0]>matriz_with_blanks.shape[0]):
-        aux = matriz_with_wrong_names
-        matriz_with_wrong_names = matriz_with_blanks
-        matriz_with_blanks = aux
-        aux2 = original_matriz
-        original_matriz = matriz_to_merge
-        matriz_to_merge = aux2'''
     for i in matriz_with_wrong_names['Municipality']:
         score = 0
         winner = ''

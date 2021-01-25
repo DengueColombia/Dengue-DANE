@@ -53,6 +53,7 @@ municipality_area_data = pd.read_csv(municipality_area_file)
 for i in range(len(municipality_area_data['Departamento'])):
     municipality_area_data.loc[i,'Departamento'] = normalize(municipality_area_data.loc[i,'Departamento'].upper())
 main_file = pd.read_csv(dengue_data_file)
+municipalities_df = []
 # List of main directories
 states = os.listdir(main_path)
 
@@ -87,8 +88,8 @@ for i in range(len(states)):
     #######################################################################################
 
     s[:,24:26] = function2(state_code, state_name, municipality_data, health_providers_data, municipality_area_data, houses_data)
-    # Redondeamos todos los resultados a dos decimales y se escriben como porcentaje
-    s[:,1:-2] = np.round(s[:,1:-2]*100,2)
+    # Redondeamos todos los resultados a dos decimales y se escriben como porcentaje, menos las ultimas dos filas
+    s[:,1:-8] = np.round(s[:,1:-8]*100,2)
     # Se ajustan los codigos de cada municipio para el merge final
     s[:,0] = s[:,0] + state_code*1000
 
@@ -97,12 +98,17 @@ for i in range(len(states)):
     #####################################################################################################
 
     Municipality_Data = pd.DataFrame(s, columns = columns_names)
-    print(Municipality_Data)
-    main_file = pd.merge(main_file, Municipality_Data, on='Municipality code', how='outer')
-    size_error(main_file,1122)
+    aux_df = pd.merge(main_file, Municipality_Data, on='Municipality code', how='inner')
+    municipalities_df.append(aux_df)
 
 # Optimization
+final = municipalities_df[0]
+for i in range(1,len(municipalities_df)):
+    final = final.append(municipalities_df[i],ignore_index=True)
+main_file = main_file.merge(final, on='Municipality code', how='outer')
 main_file['Municipality code'] = main_file['Municipality code'].apply(int)
 main_file['Municipality code'] = pd.to_numeric(main_file['Municipality code'], downcast='integer')
+print(main_file)
+size_error(main_file,1122)
 # Creating the csv file
 main_file.to_csv('DANE_Dengue_Data_Variables.csv', index=False)
