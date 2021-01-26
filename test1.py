@@ -90,6 +90,7 @@ for i in range(len(states)):
     s[:,24:26] = function2(state_code, state_name, municipality_data, health_providers_data, municipality_area_data, houses_data)
     # Redondeamos todos los resultados a dos decimales y se escriben como porcentaje, menos las ultimas dos filas
     s[:,1:-8] = np.round(s[:,1:-8]*100,2)
+    s[:,-8:] = np.round(s[:,-8:]*100,6)
     # Se ajustan los codigos de cada municipio para el merge final
     s[:,0] = s[:,0] + state_code*1000
 
@@ -104,6 +105,7 @@ for i in range(len(states)):
 final = municipalities_df[0]
 for i in range(1,len(municipalities_df)):
     final = final.append(municipalities_df[i],ignore_index=True)
+print(final)
 # Falta eliminar columnas innecesarias antes del merge
 main_file = main_file.merge(final, on='Municipality code', how='outer')
 main_file['Municipality code'] = main_file['Municipality code'].apply(int)
